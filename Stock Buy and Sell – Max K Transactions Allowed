@@ -1,0 +1,44 @@
+class Solution {
+  public:
+    int f(int index, int investment, int transaction, int n, vector<int> &prices, vector<vector<vector<int>>> &dp, int k)
+{
+    if (index == n || transaction >= k)
+    {
+        if (investment != 0)
+            return -1e9;
+        else
+            return 0;
+    }
+    if (dp[index][transaction][investment] != -1)
+    {
+        return dp[index][transaction][investment];
+    }
+    if (investment != 0)
+    {
+        int sell = prices[index] + f(index + 1, 0, transaction + 1, n, prices, dp, k);
+        int notsell = f(index + 1, 1, transaction, n, prices, dp, k);
+        return dp[index][transaction][investment] = max(sell, notsell);
+    }
+    else
+    {
+        int pick = INT_MIN;
+        if (transaction < k)
+        {
+            pick = -prices[index] + f(index + 1, 1, transaction, n, prices, dp, k);
+        }
+        int notpick = f(index + 1, 0, transaction, n, prices, dp, k);
+        return dp[index][transaction][investment] = max(pick, notpick);
+    }
+}
+    int maxProfit(vector<int>& prices, int k) {
+        // code here
+        // Write your code here.
+    int n = prices.size();
+    vector<vector<vector<int>>> dp(n, vector<vector<int>>(k, vector<int>(2, -1)));
+    int ans = f(0, 0, 0, n, prices, dp, k);
+    if (ans < 0)
+        return 0;
+    else
+        return ans;
+    }
+};
