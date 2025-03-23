@@ -1,0 +1,31 @@
+class Solution {
+  public:
+    int findcount(string &digits, int index, set<string>&st, vector<int>&dp){
+        if(index == digits.size()){
+            return 1;
+        }
+        if(dp[index] != -1){
+            return dp[index];
+        }
+        string str = "";
+        int count = 0;
+        for(int j = index; j < digits.size(); j++){
+            str = str + digits[j];
+            if(st.find(str) != st.end()){
+                count = count + findcount(digits, j + 1, st, dp);
+            }
+            else{
+                break;
+            }
+        }
+        return dp[index] = count;
+    }
+    int countWays(string &digits) {
+        set<string>st;
+        vector<int>dp(digits.size(), -1);
+        for(int i = 1; i <= 26; i++){
+            st.insert(to_string(i));
+        }
+        return findcount(digits, 0, st, dp);
+    }
+};
