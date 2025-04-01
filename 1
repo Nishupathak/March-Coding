@@ -1,0 +1,24 @@
+
+class Solution {
+  public:
+    vector<int> dfs(vector<vector<int>>& adj) {
+        // Code here
+        int n = adj.size();
+        vector<int> result;
+        vector<bool> visited(n, false);
+
+        function<void(int)> dfsHelper = [&](int v) {
+            visited[v] = true;
+            result.push_back(v);
+            for (int neighbor : adj[v]) {
+                if (!visited[neighbor]) {
+                    dfsHelper(neighbor);
+                }
+            }
+        };
+
+        dfsHelper(0); // Start DFS from vertex 0
+        return result;
+        
+    }
+};
