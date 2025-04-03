@@ -1,0 +1,93 @@
+class Solution {
+  public:
+    int orangesRotting(vector<vector<int>>& mat) {
+        int n = mat.size();
+        // Get the number of rows. Constraint: 1 <= n <= 500.
+        // No explicit check for n=0 is needed due to constraints, but it's safe practice.
+        if (n == 0) return 0; 
+        
+        int m = mat[0].size();
+        // Get the number of columns. Constraint: 1 <= m <= 500.
+        // No explicit check for m=0 is needed.
+        if (m == 0) return 0;
+
+        // Queue for Breadth-First Search (BFS).
+        // Stores pairs of {{row, col}, time}, where time is when the orange at {row, col} became rotten.
+        queue<pair<pair<int, int>, int>> q;
+        
+        int fresh_oranges = 0; // Counter for the number of fresh oranges.
+        
+        // Step 1: Initialize the queue and count fresh oranges.
+        // Iterate through the grid to find initially rotten oranges and count fresh ones.
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                if (mat[i][j] == 2) {
+                    // If an orange is rotten initially, add it to the BFS queue with time 0.
+                    q.push({{i, j}, 0});
+                } else if (mat[i][j] == 1) {
+                    // If an orange is fresh, increment the count.
+                    fresh_oranges++;
+                }
+            }
+        }
+
+        // Step 2: Handle the edge case where there are no fresh oranges initially.
+        // If there are no fresh oranges, the time required is 0.
+        if (fresh_oranges == 0) {
+            return 0; 
+        }
+        
+        // If there are fresh oranges but no initial rotten oranges, it's impossible to rot them.
+        // This case is handled implicitly: the queue will be empty, the BFS loop won't run,
+        // fresh_oranges will remain > 0, and the function will return -1 at the end.
+
+        int max_time = 0; // Variable to store the maximum time encountered, which is the final answer.
+        
+        // Define directions for exploring adjacent cells (up, down, left, right).
+        int dr[] = {-1, 1, 0, 0};
+        int dc[] = {0, 0, -1, 1};
+
+        // Step 3: Perform BFS simulation of the rotting process.
+        while (!q.empty()) {
+            // Get the current rotten orange's position and the time it became rotten.
+            pair<int, int> current_pos = q.front().first;
+            int current_time = q.front().second;
+            q.pop(); // Remove the processed orange from the queue.
+
+            int r = current_pos.first;
+            int c = current_pos.second;
+
+            // Update the maximum time. The final answer is the time the last orange finishes rotting.
+            max_time = max(max_time, current_time);
+
+            // Explore the 4 adjacent neighbors (up, down, left, right).
+            for (int i = 0; i < 4; ++i) {
+                int nr = r + dr[i]; // Calculate neighbor's row index.
+                int nc = c + dc[i]; // Calculate neighbor's column index.
+
+                // Check if the neighbor is within the grid boundaries.
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
+                     // Check if the neighbor is a fresh orange (value 1).
+                    if (mat[nr][nc] == 1) {
+                        // If it's a fresh orange, rot it.
+                        mat[nr][nc] = 2; 
+                        // Decrement the count of remaining fresh oranges.
+                        fresh_oranges--;
+                        // Add the newly rotten orange to the queue. 
+                        // It will rot its neighbors at the next time step (current_time + 1).
+                        q.push({{nr, nc}, current_time + 1});
+                    }
+                }
+            }
+        }
+
+        // Step 4: Check the result after the BFS is complete.
+        // If the count of fresh oranges is 0, it means all were successfully rotten.
+        if (fresh_oranges == 0) {
+            return max_time; // Return the time taken for the last orange to rot.
+        } else {
+            // If fresh_oranges is still greater than 0, it means some fresh oranges were unreachable.
+            return -1; 
+        }
+    }
+};
