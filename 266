@@ -1,0 +1,44 @@
+class Solution {
+  public:
+    int countNodes(Node* root) {
+        if (!root) return 0;
+        return 1 + countNodes(root->left) + countNodes(root->right);
+    }
+    
+    bool isComplete(Node* root, int index, int totalNodes) {
+        if (!root) return true;
+        if (index >= totalNodes) return false;
+        
+        return isComplete(root->left, 2 * index + 1, totalNodes) &&
+               isComplete(root->right, 2 * index + 2, totalNodes);
+    }
+    
+    bool isHeapUtil(Node* root) {
+        if (!root) return true;
+        
+        // Leaf node
+        if (!root->left && !root->right) return true;
+        
+        // Node with only left child
+        if (root->left && !root->right) {
+            return (root->data >= root->left->data) && isHeapUtil(root->left);
+        }
+        
+        // Node with both children
+        if (root->left && root->right) {
+            return (root->data >= root->left->data) && (root->data >= root->right->data)
+                    && isHeapUtil(root->left) && isHeapUtil(root->right);
+        }
+        
+        return false; // Should not reach here
+    }
+  
+    bool isHeap(Node* tree) {
+        int totalNodes = countNodes(tree);
+        
+        if (isComplete(tree, 0, totalNodes) && isHeapUtil(tree))
+            return true;
+        else
+            return false;
+    }
+};
